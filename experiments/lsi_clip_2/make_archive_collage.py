@@ -14,19 +14,19 @@ from pathlib import Path
 import torch
 import numpy as np
 import pandas as pd
-from stylegan_models import g_all, g_synthesis, g_mapping
+import pickle
 
 from PIL import Image
 
 # Note that only final archives encode latent codes.
-archive_filename = 'logs/cma_mae/trial_0/archive_00010000.pkl'
+archive_filename = 'logs/cma_maega/trial_0/archive_00010000.pkl'
 
 # min and max index for rows then columns (row major).
 # The archive is shape (200, 200) indexed from [0, 200).
 archive_dims = (200, 200)
-archive_index_range = ((100, 200), (100, 200))
+archive_index_range = ((64, 135), (64, 135))
 # Measure ranges
-measure_ranges = ((0,6), (0,6))
+measure_ranges = ((-0.3, 0.3), (-0.3, 0.3))
 # Controls that x rows and y columns are generated
 # Images are "evenly" (as possible) sampled based on this criteria
 picture_frequency = (8, 5) 
@@ -41,10 +41,11 @@ logdir = Path(gen_output_dir)
 if not logdir.is_dir():
     logdir.mkdir()
 
-g_synthesis.eval()
-g_synthesis.to(device)
-for p in g_synthesis.parameters():
-    p.requires_grad_(False)
+model_filename = 'models/stylegan2-ffhq-1024x1024.pkl'
+with open(model_filename, 'rb') as fp:
+    model = pickle.load(fp)['G_ema'].to(device)
+    model.eval()
+latent_shape = (1, -1, 512)
 
 # Read the archive from the log (pickle file)
 df = pd.read_pickle(archive_filename)
@@ -71,11 +72,14 @@ for j in reversed(range(picture_frequency[1])):
             sol = df_cell.iloc[df_cell['objective'].argmax()]
             print(sol)
 
-            latent_code = torch.tensor(sol[5:].values, dtype=torch.float32, device=device)
-            latents = torch.nn.Parameter(latent_code, requires_grad=False)
-            dlatents = latents.repeat(1,18,1)
+            q = torch.tensor(
+                    sol[5:].values.reshape(latent_shape),
+                    device=device,
+                    requires_grad=True,
+                )
+            w = q * w_stds + model.mapping.w_avg
 
-            img = g_synthesis(dlatents)
+            img = model.synthesis(w, noise_mode='const')
             img = (img.clamp(-1, 1) + 1) / 2.0 # Normalize from [0,1]
 
             # Uncomment to save all grid images separately.
@@ -96,10 +100,8 @@ img_grid = make_grid(imgs, nrow=picture_frequency[0], padding=0)
 img_grid = np.transpose(img_grid.cpu().numpy(), (1,2,0))
 plt.imshow(img_grid)
 
-#plt.xlabel("A man with blue eyes.")
-#plt.ylabel("A person with red hair.")
-plt.xlabel("A woman with long blonde hair.")
-plt.ylabel("A small child.")
+plt.xlabel("Age.")
+plt.ylabel("Hair Length.")
 
 def create_archive_tick_labels(axis_range, measure_range, dim, num_ticks):
     low_pos = axis_range[0] / dim

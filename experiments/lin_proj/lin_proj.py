@@ -138,6 +138,7 @@ def create_optimizer(algorithm, dim, alpha=1.0, resolution=100, seed=None):
     if algorithm in [
             "map_elites", "map_elites_line",
             "cma_me", "cma_me_star", "cma_mega",
+            "cma_me_io",
     ]:
         archive = GridArchive(grid_dims, bounds, seed=seed)
     elif algorithm in ["cma_mae", "cma_maega"]:
@@ -210,6 +211,27 @@ def create_optimizer(algorithm, dim, alpha=1.0, resolution=100, seed=None):
                                selection_rule='mu',
                                batch_size=batch_size,
                                seed=s) for s in emitter_seeds
+        ]
+    elif algorithm in ["cma_me_io"]:
+        emitters = []
+        split_count = len(emitter_seeds) // 2
+        emitters += [
+            OptimizingEmitter(archive,
+                              initial_sol,
+                              0.5,
+                              restart_rule='basic',
+                              selection_rule='mu',
+                              batch_size=batch_size,
+                              seed=s) for s in emitter_seeds[:split_count]
+        ]
+        emitters += [
+            ImprovementEmitter(archive,
+                               initial_sol,
+                               0.5,
+                               restart_rule='basic',
+                               selection_rule='mu',
+                               batch_size=batch_size,
+                               seed=s) for s in emitter_seeds[split_count:]
         ]
     elif algorithm in ["cma_me_star"]:
         emitters = [
