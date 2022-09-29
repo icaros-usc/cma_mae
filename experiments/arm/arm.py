@@ -14,6 +14,7 @@ from dask.distributed import Client, LocalCluster
 from ribs.archives import CVTArchive, GridArchive
 from ribs.emitters import (AnnealingEmitter, GaussianEmitter, 
                            ImprovementEmitter, IsoLineEmitter, 
+                           OptimizingEmitter,
                            GradientEmitter, GradientAnnealingEmitter,
                            GradientImprovementEmitter)
 from ribs.optimizers import Optimizer
