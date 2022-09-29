@@ -1,5 +1,6 @@
 name: cma_mae_exps
 channels:
+   - conda-forge
    - pytorch
    - nvidia
    - defaults
@@ -11,9 +12,14 @@ dependencies:
    - torchvision=0.10.1=py38_cu111
    - pip:
       - alive-progress==1.6.2 
+      - bokeh==2.4.3
       - dask==2.20.0
       - distributed==2.30.1
+      - einops
       - fire==0.4.0
       - git+https://github.com/openai/CLIP.git
+      - kornia
       - matplotlib==3.4.2
+      - omegaconf
+      - pytorch-lightning
       - seaborn==0.11.1
