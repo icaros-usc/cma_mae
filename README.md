@@ -26,7 +26,7 @@ pip3 install -e .[all]
 
 To run LSI (StyleGAN) experiments, you must first download the StyleGAN pretrained models from the StyleGAN [repo](https://github.com/lernapparat/lernapparat/releases/download/v2019-02-01/karras2019stylegan-ffhq-1024x1024.for_g_all.pt). Place the `.pt` file in the folder `experiments/lsi_clip`.
 
-To run LSI (StyleGAN2) experiments, you must first download the StyleGAN2 pretrained model from the Nvidia [website](https://catalog.ngc.nvidia.com/orgs/nvidia/teams/research/models/stylegan2/files). Place the `.pt` file in the folder `experiments/lsi_clip_2/models`.
+To run LSI (StyleGAN2) experiments, you must first download the StyleGAN2 pretrained model `stylegan2-ffhq-1024x1024.pkl` from the Nvidia [website](https://catalog.ngc.nvidia.com/orgs/nvidia/teams/research/models/stylegan2/files). Place the `.pt` file in the folder `experiments/lsi_clip_2/models`.
 
 CLIP automatically installs with the conda environment.
 
