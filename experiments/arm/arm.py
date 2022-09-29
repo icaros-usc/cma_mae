@@ -91,6 +91,7 @@ def create_optimizer(algorithm, dim, link_lengths,
     if algorithm in [
             "map_elites", "map_elites_line", 
             "cma_me", "cma_me_star", "cma_mega", 
+            "cma_me_io",
     ]:
         archive = GridArchive(grid_dims, bounds, seed=seed)
     elif algorithm in ["cma_mae", "cma_maega"]:
