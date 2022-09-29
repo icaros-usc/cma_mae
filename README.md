@@ -2,7 +2,7 @@
 
 This repository contains code for the experiments of the Covariance Matrix Adaptation MAP-Annealing (CMA-MAE) paper.
 
-The project contains a modified version of [pyribs](https://pyribs.org) a quality diversity optimization library from the [Differentiable Quality Diversity](https://proceedings.neurips.cc/paper/2021/hash/532923f11ac97d3e7cb0130315b067dc-Abstract.html) paper ([github](https://github.com/icaros-usc/dqd)). We implement the CMA-MAE and CMA-MAEGA algorithms in pyribs. The `AnnealingEmitter` (see `ribs/emitters/_annealing_emitter.py`) implements the CMA-MAE algorithm and the `GradientAnnealingEmitter` (see `ribs/emitters/_gradient_annealing_emitter.py`) implements the CMA-MAEGA algorithm. We modify `ArchiveBase` (see `ribs/archives/_archive_base.py`) to implement acceptance thresholds needed by both algorithms.
+The project contains a modified version of [pyribs](https://pyribs.org), a quality diversity optimization library, from the [Differentiable Quality Diversity](https://proceedings.neurips.cc/paper/2021/hash/532923f11ac97d3e7cb0130315b067dc-Abstract.html) paper ([github](https://github.com/icaros-usc/dqd)). We implement the CMA-MAE and CMA-MAEGA algorithms in pyribs. The `AnnealingEmitter` (see `ribs/emitters/_annealing_emitter.py`) implements the CMA-MAE algorithm and the `GradientAnnealingEmitter` (see `ribs/emitters/_gradient_annealing_emitter.py`) implements the CMA-MAEGA algorithm. We modify `ArchiveBase` (see `ribs/archives/_archive_base.py`) to implement acceptance thresholds needed by both algorithms.
 
 ## Requirements
 
@@ -24,9 +24,15 @@ pip3 install -e .[all]
 
 ## Pretrained Models
 
-To run LSI experiments, you must first download the StyleGAN pretrained models from the StyleGAN [repo](https://github.com/lernapparat/lernapparat/releases/download/v2019-02-01/karras2019stylegan-ffhq-1024x1024.for_g_all.pt). Place the `.pt` file in the folder `experiments/lsi_clip`.
+To run LSI (StyleGAN) experiments, you must first download the StyleGAN pretrained models from the StyleGAN [repo](https://github.com/lernapparat/lernapparat/releases/download/v2019-02-01/karras2019stylegan-ffhq-1024x1024.for_g_all.pt). Place the `.pt` file in the folder `experiments/lsi_clip`.
+
+To run LSI (StyleGAN2) experimenets, you must first download the StyleGAN2 pretrained model from the Nvidia [website](https://catalog.ngc.nvidia.com/orgs/nvidia/teams/research/models/stylegan2/files). Place the `.pt` file in the folder `experiments/lsi_clip_2/models`.
 
 CLIP automatically installs with the conda environment.
+
+## StyleGAN2 Additional Code
+
+We include dnnlib and torch_util from the StyleGAN2-Ada [repo](https://github.com/NVlabs/stylegan2-ada) in `experiments/lsi_clip_2` for replicability.
 
 ## Running Experiments
 
@@ -37,6 +43,7 @@ For each experiment you pick an identifier for the algorithm you want to run.
 | MAP-Elites                  | map_elites         |
 | MAP-Elites (line)           | map_elites_line    |
 | CMA-ME                      | cma_me             |
+| CMA-ME (imp, opt)           | cma_me_io          |
 | CMA-ME*                     | cma_me_star        |
 | CMA-MAE                     | cma_mae            |
 | CMA-MEGA                    | cma_mega           |
@@ -124,7 +131,7 @@ python3 arm.py --help
 
 ```
 
-### Latent Space Illumination (LSI)
+### Latent Space Illumination (StyleGAN)
 
 To run an experiment with MAP-Elites:
 
@@ -144,6 +151,25 @@ python3 lsi.py --help
 
 ```
 
+### Latent Space Illumination (StyleGAN2)
+
+To run an experiment with MAP-Elites:
+
+```bash
+conda activate cma_mae_exps
+cd experiments/lsi_clip_2
+
+python3 lsi.py map_elites 
+```
+
+To run a different algorithm replace `map_elites` with another identifier from the above table.
+
+For additional options see:
+
+```bash
+python3 lsi.py --help
+
+```
 
 ## Results
 
@@ -185,7 +211,7 @@ The following tables contain the reported results from the paper and commands to
 | CMA-ME                        | 75.82       | 75.89%     | `python3 arm.py cma_me`               |
 | CMA-MAE                       | 79.03       | 79.24%     | `python3 arm.py cma_mae --alpha 0.01` |
 
-### Latent Space Illumination (LSI)
+### Latent Space Illumination (StyleGAN)
 
 | Quality Diversity Algorithms  | QD-score    | Coverage   | Experiment Command                   |
 | ----------------------------  | ----------: | ---------: | :----------------------------------- |
@@ -194,6 +220,14 @@ The following tables contain the reported results from the paper and commands to
 | CMA-ME                        | 14.00       | 19.57%     | `python3 lsi.py cma_me`              |
 | CMA-MAE                       | 17.67       | 25.08%     | `python3 lsi.py cma_mae --alpha 0.1` |
 
+### Latent Space Illumination (StyleGAN2)
+
+| Quality Diversity Algorithms  | QD-score    | Coverage   | Experiment Command                   |
+| ----------------------------  | ----------: | ---------: | :----------------------------------- |
+| MAP-Elites                    | -276.18     | 4.48%      | `python3 lsi.py map_elites`          |
+| MAP-Elites (line)             | -827.25     | 8.81%      | `python3 lsi.py map_elites_line`     |
+| CMA-MEGA                      | 9.18        | 14.91%     | `python3 lsi.py cma_mega`            |
+| CMA-MAEGA                     | 11.51       | 18.62%     | `python3 lsi.py cma_maega`           |
 
 See the paper and supplementary materials for full data and standard error bars.
 
