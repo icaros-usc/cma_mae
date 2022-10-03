@@ -47,6 +47,12 @@ with open(model_filename, 'rb') as fp:
     model.eval()
 latent_shape = (1, -1, 512)
 
+zs = torch.randn([10000, model.mapping.z_dim], device=device)
+ws = model.mapping(zs, None)
+w_stds = ws.std(0)
+qs = ((ws - model.mapping.w_avg) / w_stds).reshape(10000, -1)
+q_norm = torch.norm(qs, dim=1).mean() * 0.1
+
 # Read the archive from the log (pickle file)
 df = pd.read_pickle(archive_filename)
 
